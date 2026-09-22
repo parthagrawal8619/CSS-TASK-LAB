@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container{
+            width: 500px;
+            display: grid;
+            margin-left: 33%;
+            margin-top: 10%;
+            gap: 2%;
+            grid-template-areas:
+            "box1 box1 box2" 
+            "box1 box1 box3"
+            "box4 box5 box6"; 
+        }
+        .box{
+        border-radius: 8px;
+        color: rgb(40, 38, 38);
+        background-color: rgba(10, 164, 67, 0.359);
+        min-height: 100px;
+        color: rgb(4, 61, 111);
+        font-size: 25px;
+        text-align: center; 
+        display: grid;
+        place-items: center;     
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box" style="grid-area: box1; background-color: rgb(116, 125, 215);">FEATURING ARTICLE</div>
+        <div class="box" style="grid-area: box2; background-color: rgb(128, 227, 168);">NEWS 1</div>
+        <div class="box" style="grid-area: box3; background-color: rgb(204, 226, 137);">NEWS 2</div>
+        <div class="box" style="grid-area: box4; background-color: rgb(199, 112, 112);">ADVERTISEMENT</div>
+        <div class="box" style="grid-area: box5; background-color: rgb(194, 142, 201);">ARTICLE</div>
+        <div class="box" style="grid-area: box6; background-color: rgb(159, 100, 214);">NEWS 3</div>
+    </div>
+</body>
+</html>
