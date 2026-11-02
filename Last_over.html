@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Last Over - Mini Cricket Chase</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .game {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+      padding: 28px 32px;
+      width: 100%;
+      max-width: 520px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1b5e20;
+    }
+    .diff-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .diff-btns button {
+      padding: 6px 14px;
+      border: 2px solid #81c784;
+      background: #fff;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #2e7d32;
+      transition: all 0.2s;
+    }
+    .diff-btns button.active {
+      background: #2e7d32;
+      color: #fff;
+      border-color: #2e7d32;
+    }
+    .diff-btns button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .scoreboard {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .score-item label {
+      display: block;
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .score-item .val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1b5e20;
+    }
+    .score-item .sub {
+      font-size: 0.9rem;
+      color: #888;
+      font-weight: 500;
+    }
+    .pitch-area {
+      background: linear-gradient(90deg, #a5d6a7, #c8e6c9);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ball-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2e7d32;
+      margin-bottom: 14px;
+    }
+    .track {
+      height: 48px;
+      background: rgba(255,255,255,0.6);
+      border-radius: 24px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+    .ball {
+      width: 18px;
+      height: 18px;
+      background: #e53935;
+      border-radius: 50%;
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 2;
+      transition: none;
+    }
+    .hit-zone {
+      position: absolute;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 56px;
+      height: 40px;
+      border: 2px dashed #2e7d32;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: #2e7d32;
+      font-weight: 600;
+      background: rgba(255,255,255,0.5);
+    }
+    .stumps {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 3px;
+    }
+    .stump {
+      width: 4px;
+      height: 28px;
+      background: #5d4037;
+      border-radius: 2px;
+    }
+    .over-balls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .over-balls span.label {
+      font-size: 0.85rem;
+      color: #555;
+      font-weight: 500;
+    }
+    .ball-result {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      background: #e0e0e0;
+      color: #666;
+    }
+    .ball-result.scored { background: #66bb6a; color: #fff; }
+    .ball-result.wicket { background: #ef5350; color: #fff; }
+    .ball-result.dot { background: #bdbdbd; color: #fff; }
+    .commentary {
+      min-height: 28px;
+      font-size: 1rem;
+      color: #333;
+      font-style: italic;
+      margin-bottom: 18px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .hit-btn {
+      padding: 14px 48px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(46,125,50,0.4);
+      transition: transform 0.1s, background 0.2s;
+    }
+    .hit-btn:hover:not(:disabled) { background: #1b5e20; }
+    .hit-btn:active:not(:disabled) { transform: scale(0.96); }
+    .hit-btn:disabled {
+      background: #a5d6a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .result-box {
+      background: #fff;
+      padding: 36px 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 340px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .result-box h2 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+    .result-box.win h2 { color: #2e7d32; }
+    .result-box.lose h2 { color: #c62828; }
+    .result-box p {
+      color: #555;
+      margin-bottom: 24px;
+      font-size: 1.05rem;
+    }
+    .play-again {
+      padding: 12px 32px;
+      font-size: 1rem;
+      font-weight: 700;
+      background: #2e7d32;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+    .play-again:hover { background: #1b5e20; }
+    .hint {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <div class="header">
+      <div class="title">Last over</div>
+      <div class="diff-btns">
+        <button id="easyBtn" class="active">Easy</button>
+        <button id="medBtn">Medium</button>
+        <button id="hardBtn">Hard</button>
+      </div>
+    </div>
+
+    <div class="scoreboard">
+      <div class="score-item">
+        <label>Need</label>
+        <div class="val"><span id="need">12</span> <span class="sub"></span></div>
+      </div>
+      <div class="score-item">
+        <label>Balls left</label>
+        <div class="val" id="ballsLeft">6</div>
+      </div>
+      <div class="score-item">
+        <label>Wickets</label>
+        <div class="val"><span id="wickets">0</span> <span class="sub">of 2</span></div>
+      </div>
+    </div>
+
+    <div class="pitch-area">
+      <div class="ball-label">Ball <span id="ballNum">1</span> of 6</div>
+      <div class="track" id="track">
+        <div class="ball" id="ball"></div>
+        <div class="hit-zone">Hit zone</div>
+        <div class="stumps">
+          <div class="stump"></div>
+          <div class="stump"></div>
+          <div class="stump"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="over-balls">
+      <span class="label">This over</span>
+      <div class="ball-result" id="r0">–</div>
+      <div class="ball-result" id="r1">–</div>
+      <div class="ball-result" id="r2">–</div>
+      <div class="ball-result" id="r3">–</div>
+      <div class="ball-result" id="r4">–</div>
+      <div class="ball-result" id="r5">–</div>
+    </div>
+
+    <div class="commentary" id="commentary">Choose difficulty and press Hit (or Space) when the ball enters the zone!</div>
+
+    <div class="actions">
+      <button class="hit-btn" id="hitBtn">HIT</button>
+    </div>
+    <div class="hint">Press Spacebar or click HIT</div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="result-box" id="resultBox">
+      <h2 id="resultTitle">You Win!</h2>
+      <p id="resultMsg"></p>
+      <button class="play-again" id="playAgain">Play Again</button>
+    </div>
+  </div>
+
+  <script src="Last_Over_CricketGame.js"></script>
+</body>
+</html>
